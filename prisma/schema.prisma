@@ -134,3 +134,93 @@ model CommentVote {
 
   @@id([userId, commentId])
 }
+
+
+// model Subreddit {
+//   id          String @default(cuid())
+//   name        String @unique 
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+//   posts       Post[]
+
+//   creatorId   String? 
+//   creator     User? @relation("createdBy",fields: [creatorId], references: [id])
+
+//   subscribers Subscription[]
+
+//   @@index([name])
+// }
+
+// model Subscription{
+//   userId       String
+//   user         User @relation(fields: [userId], references: [id])
+
+//   subredditId  String
+//   subreddit    Subreddit @relation(fields: [subredditId], references: [id])
+
+//   @@id([userId, subredditId])
+// }
+
+// model Post{
+//   id          String @default(cuid())
+//   title       String  
+//   content     Json?
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+
+//   subredditId String
+//   subreddit   Subreddit @relation(fields: [subredditId], references:[id])
+
+//   authorId    String
+//   author      User @relation(fields: [authorId], references: [id])
+
+//   comments    Comment[]
+//   votes       Vote[]
+// }
+
+// model Comment{
+//   id          String @default(cuid())
+//   text        String
+//   createdAt   DateTime @default(now())
+
+//   authorId    String
+//   author      User @relation(fields: [authorId], references: [id])
+
+//   postId      String
+//   post        Post @relation(fields: [postId], references: [id])
+
+//   replyToId   String?
+//   replyTo     Comment? @relation("replyTo", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+//   replies     Comment[] @relation("replyTo")
+
+//   votes       CommentVote[]
+//   commentId   String?
+// }
+
+// model CommentVote{
+//   userId      String
+//   user        User @relation(fields: [userId], references: [id])
+
+//   commentId   String
+//   comment     Comment @relation(fields: [commentId], references: [id])
+
+//   type        VoteType
+
+//   @@id([userId, commentId])
+// }
+
+// model Vote {
+//   userId      String
+//   user        User @relation(fields: [userId], references: [id])
+
+//   postId      String
+//   post        Post @relation(fields: [postId], references: [id])
+//   vote VoteType
+
+//   @@id([userId, postId])
+// }
+
+
+
+
+
