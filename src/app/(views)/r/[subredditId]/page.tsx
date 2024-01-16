@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { INFINITE_SCROLLING_PAGINATION_RESULTS } from "../../../../../config";
 import { notFound } from "next/navigation";
 import { MiniCreatePost } from "@/components/mini-create-post";
+import { PostFeed } from "@/components/post-feed";
 
 export default async function page({ params }: {
     params: {
@@ -41,6 +42,7 @@ export default async function page({ params }: {
             </h1>
             <MiniCreatePost session={session} />
             {/* TODO: show posts in user feed */}
+            <PostFeed initialPosts={subreddit.posts} subredditName={subreddit.name} userId={session?.user.id} />
         </>
     )
 }
