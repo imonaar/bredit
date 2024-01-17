@@ -3,6 +3,7 @@
 import axios from 'axios';
 import { useEffect } from "react";
 
+import { useSession } from 'next-auth/react'
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2 } from 'lucide-react';
 import { useInView } from "react-intersection-observer";
@@ -25,6 +26,7 @@ type UserQueryParams = {
 
 export function PostFeed({ initialPosts, subredditName, userId }: PostFeedProps) {
     const { ref, inView } = useInView();
+    const { data: session } = useSession()
 
     const fetchPosts = async ({ take, cursor, subredditName }: UserQueryParams) => {
         const response = await axios.get(`/api/posts`, {
@@ -35,8 +37,6 @@ export function PostFeed({ initialPosts, subredditName, userId }: PostFeedProps)
 
     const {
         data,
-        error,
-        isLoading,
         hasNextPage,
         fetchNextPage,
         isSuccess,
@@ -63,13 +63,14 @@ export function PostFeed({ initialPosts, subredditName, userId }: PostFeedProps)
             {
                 posts?.map((post, index: number) => {
                     const totalVotes = post?.votes.reduce((total, vote) => {
+                        console.log(vote.type)
                         if (vote.type === 'UP') return total + 1
                         if (vote.type === 'DOWN') return total - 1
                         return total
                     }, 0)
 
                     const currentVote = post.votes.find(
-                        (vote) => vote.userId === userId
+                        (vote) => vote.userId === session?.user.id
                     )
 
                     if (index === posts.length - 1) {

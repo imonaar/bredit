@@ -1,22 +1,43 @@
-import { NextResponse } from "next/server";
-import * as z from 'zod';
-
-import { getAuthSession } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { redis } from "@/lib/redis";
-import { PostVoteValidator } from "@/lib/validators/vote";
-import { CachedPost } from "@/types/redis";
+import { getAuthSession } from '@/lib/auth'
+import { db } from '@/lib/db'
+import { redis } from '@/lib/redis'
+import { PostVoteValidator } from '@/lib/validators/vote'
+import { CachedPost } from '@/types/redis'
+import { z } from 'zod'
 
 const CACHE_AFTER_UPVOTES = 1
+
+{/* 
+    Took too long debugging an async error in this router
+
+    ---
+    await redis.hset(`post:${postId}`, cachePayload) 
+    ---
+    await redis.hset does not work. Redis works synchronously and the the functions should be called
+    synchronously
+
+    I was wondering why the vote was not being registered on the database and this is why,
+
+
+    -- redis website
+    By default, each time a function is invoked, it is executed synchronously.
+    This ensures the atomicity property, meaning that no other commands will be executed on Redis 
+    while the function is running. The atomicity property offers several advantages:
+        -   Multiple keys can be updated simultaneously, guaranteeing that other clients see the complete 
+            update rather than partial updates.
+        - The data in Redis remains unchanged while it is being processed.
+*/ }
 
 export async function PATCH(req: Request) {
     try {
         const body = await req.json()
+
         const { postId, voteType } = PostVoteValidator.parse(body)
+
         const session = await getAuthSession()
 
         if (!session?.user) {
-            return new NextResponse('Unauthorized', { status: 401 })
+            return new Response('Unauthorized', { status: 401 })
         }
 
         // check if user has already voted on this post
@@ -38,13 +59,11 @@ export async function PATCH(req: Request) {
         })
 
         if (!post) {
-            return new NextResponse('Post not found', { status: 404 })
+            return new Response('Post not found', { status: 404 })
         }
 
         if (existingVote) {
-            // if vote type is the same as existing vote, delete the vote
             if (existingVote.type === voteType) {
-
                 await db.vote.delete({
                     where: {
                         userId_postId: {
@@ -54,28 +73,28 @@ export async function PATCH(req: Request) {
                     },
                 })
 
-                //recount the votes
                 const votesAmt = post.votes.reduce((acc, vote) => {
                     if (vote.type === 'UP') return acc + 1
                     if (vote.type === 'DOWN') return acc - 1
                     return acc
                 }, 0)
 
-                if (votesAmt > CACHE_AFTER_UPVOTES) {
+                if (votesAmt >= CACHE_AFTER_UPVOTES) {
                     const cachePayload: CachedPost = {
-                        id: post.id,
-                        authorUsername: post.author.username ?? "",
+                        authorUsername: post.author.username ?? '',
                         content: JSON.stringify(post.content),
+                        id: post.id,
                         title: post.title,
-                        currentVote: voteType,
-                        createdAt: post.createdAt
+                        currentVote: null,
+                        createdAt: post.createdAt,
                     }
-                    await redis.hset(`post:${postId}`, cachePayload)
+
+                    redis.hset(`post:${postId}`, cachePayload)
                 }
-                return new NextResponse('OK')
+
+                return new Response('OK')
             }
 
-            // if vote type is different, update the vote
             await db.vote.update({
                 where: {
                     userId_postId: {
@@ -88,28 +107,28 @@ export async function PATCH(req: Request) {
                 },
             })
 
-            //recount the votes
             const votesAmt = post.votes.reduce((acc, vote) => {
                 if (vote.type === 'UP') return acc + 1
                 if (vote.type === 'DOWN') return acc - 1
                 return acc
             }, 0)
 
-            if (votesAmt > CACHE_AFTER_UPVOTES) {
+            if (votesAmt >= CACHE_AFTER_UPVOTES) {
                 const cachePayload: CachedPost = {
-                    id: post.id,
-                    authorUsername: post.author.username ?? "",
+                    authorUsername: post.author.username ?? '',
                     content: JSON.stringify(post.content),
+                    id: post.id,
                     title: post.title,
                     currentVote: voteType,
-                    createdAt: post.createdAt
+                    createdAt: post.createdAt,
                 }
-                await redis.hset(`post:${postId}`, cachePayload)
+
+                redis.hset(`post:${postId}`, cachePayload)
             }
-            return new NextResponse('OK')
+
+            return new Response('OK')
         }
 
-        //if not existing, create a new vote type
         await db.vote.create({
             data: {
                 type: voteType,
@@ -118,7 +137,6 @@ export async function PATCH(req: Request) {
             },
         })
 
-        // Recount the votes
         const votesAmt = post.votes.reduce((acc, vote) => {
             if (vote.type === 'UP') return acc + 1
             if (vote.type === 'DOWN') return acc - 1
@@ -135,19 +153,19 @@ export async function PATCH(req: Request) {
                 createdAt: post.createdAt,
             }
 
-            await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
+            redis.hset(`post:${postId}`, cachePayload)
         }
-        return new NextResponse('OK')
+
+        return new Response('OK')
     } catch (error) {
         (error)
         if (error instanceof z.ZodError) {
-            return new NextResponse(error.message, { status: 400 })
+            return new Response(error.message, { status: 400 })
         }
 
-        return new NextResponse(
-            'Could not vote at this time. Please try later',
+        return new Response(
+            'Could not post to subreddit at this time. Please try later',
             { status: 500 }
         )
     }
 }
-

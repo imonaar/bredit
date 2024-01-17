@@ -1,10 +1,12 @@
 import { Navbar } from '@/components/navbar'
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from '@/lib/utils'
-import { ReactQueryClientProvider } from '@/providers/react-query-client-provider'
 import '@/styles/globals.css'
 import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
+
+import Providers from '@/components/providers'
+
 
 //intercept the authmodal in a layout on the same level as the authmodal
 export default function RootLayout({
@@ -15,9 +17,10 @@ export default function RootLayout({
   authModal: React.ReactNode,
 }) {
   return (
-    <ReactQueryClientProvider>
-    <html lang='en' className={cn('bg-white text-slate-900 antialiased', inter.className)}>
-      <body className='min-h-screen pt-12 bg-slate-50 antialiased'>
+    <Providers>
+    
+      <html lang='en' className={cn('bg-white text-slate-900 antialiased', inter.className)}>
+        <body className='min-h-screen pt-12 bg-slate-50 antialiased'>
           <Navbar />
           {authModal}
           <div className='container max-w-7xl mx-auto h-full pt-12'>
@@ -26,6 +29,6 @@ export default function RootLayout({
           <Toaster />
         </body>
       </html>
-    </ReactQueryClientProvider>
+    </Providers>
   )
 }
