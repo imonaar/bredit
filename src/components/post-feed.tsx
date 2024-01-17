@@ -4,7 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query"
 import axios from 'axios'
 
 import { ExtendedPost } from "@/types/db"
-import { useIntersection } from "@/hooks/use-intersection"
+import { useIntersection } from "@/hooks/@mantine-hooks/use-intersection"
 import { INFINITE_SCROLLING_PAGINATION_RESULTS } from "../../config"
 import Post from "./post"
 
@@ -73,6 +73,8 @@ export function PostFeed({ initialPosts, subredditName, userId }: PostFeedProps)
                                     subredditName={post.subreddit.name}
                                     post={post}
                                     commentAmt={post.comments.length}
+                                    votesAmt={totalVotes}
+                                    currentVote={currentVote}
                                 />
                             </li>
                         )
@@ -83,6 +85,8 @@ export function PostFeed({ initialPosts, subredditName, userId }: PostFeedProps)
                                     subredditName={post.subreddit.name}
                                     post={post}
                                     commentAmt={post.comments.length}
+                                    votesAmt={totalVotes}
+                                    currentVote={currentVote}
                                 />
                             </li>
                         )

@@ -5,22 +5,32 @@ import { ExtendedPost } from "@/types/db";
 import Link from "next/link";
 import { MessageSquare } from "lucide-react";
 import { EditorOutput } from "./editor-output";
+import { PostVoteClient } from "./post-vote/post-vote-client"
+import { Vote } from "@prisma/client";
+
+type PartialVote = Pick<Vote, 'type'>
 
 interface PostProps {
-    subredditName: string,
-    post: ExtendedPost,
-    commentAmt: number
+    subredditName: string;
+    post: ExtendedPost;
+    commentAmt: number;
+    votesAmt: number;
+    currentVote?: PartialVote
 }
 
-const PostPage = ({ subredditName, post, commentAmt }: PostProps) => {
+const PostPage = ({ subredditName, post, commentAmt, votesAmt, currentVote }: PostProps) => {
     const pRef = useRef<HTMLDivElement>(null)
 
     return (
         <div className="rounded-md bg-white shadow">
-            <div className="px-6 py-4 justify-between">
-                {/* TODO: post votes */}
+            <div className="px-6 py-4 flex flex-col sm:flex-row justify-between">
+                <PostVoteClient
+                    postId={post.id}
+                    initialVotesAmount={votesAmt}
+                    initialVote={currentVote?.type}
+                />
 
-                <div className="flex-1">
+                <div className="flex-1 order-first sm:order-last">
                     <div className="max-h-40 mt-1 text-xs text-gray-500">
                         {
                             subredditName ? (
