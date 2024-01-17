@@ -38,6 +38,7 @@ export function PostVoteClient({ postId, initialVotesAmount, initialVote }: Post
         },
 
         onError: (err, voteType) => {
+            console.log(err)
             if (voteType === 'UP') setVotesAmount((prev) => prev - 1)
             else setVotesAmount((prev) => prev + 1)
 

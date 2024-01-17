@@ -153,9 +153,6 @@ export function Editor({ subredditId }: EditorProps) {
             subredditId: subredditId,
             content: blocks
         }
-
-        console.log(payload)
-
         createPost(payload)
     }
 

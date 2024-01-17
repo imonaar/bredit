@@ -41,7 +41,6 @@ export default function CreatePage() {
             return axios.post('/api/subreddit', data)
         },
         onSuccess: (data) => {
-            console.log(data.data)
             toast({
                 title: `created`,
                 description: `r/${data.data} succesfully created`,

@@ -63,7 +63,6 @@ export function PostFeed({ initialPosts, subredditName, userId }: PostFeedProps)
             {
                 posts?.map((post, index: number) => {
                     const totalVotes = post?.votes.reduce((total, vote) => {
-                        console.log(vote.type)
                         if (vote.type === 'UP') return total + 1
                         if (vote.type === 'DOWN') return total - 1
                         return total

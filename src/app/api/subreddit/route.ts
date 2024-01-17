@@ -48,9 +48,6 @@ export async function POST(req: Request) {
                 subredditId: subreddit.id,
             }
         })
-
-        console.log(new NextResponse(subreddit.name))
-
         return new Response(subreddit.name)
 
     } catch (error) {
