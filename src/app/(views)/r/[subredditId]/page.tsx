@@ -10,13 +10,11 @@ export default async function page({ params }: {
         subredditId: string
     }
 }) {
-    const subredditId = params.subredditId;
+    const name = params.subredditId;
     const session = await getAuthSession()
 
     const subreddit = await db.subreddit.findFirst({
-        where: {
-            name: subredditId
-        },
+        where: { name },
         include: {
             posts: {
                 include: {
@@ -24,10 +22,13 @@ export default async function page({ params }: {
                     votes: true,
                     comments: true,
                     subreddit: true,
-                }
-            }
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                },
+                // take: INFINITE_SCROLLING_PAGINATION_RESULTS,
+            },
         },
-        take: INFINITE_SCROLLING_PAGINATION_RESULTS
     })
 
     if (!subreddit) {
@@ -42,7 +43,11 @@ export default async function page({ params }: {
             </h1>
             <MiniCreatePost session={session} />
             {/* TODO: show posts in user feed */}
-            <PostFeed initialPosts={subreddit.posts} subredditName={subreddit.name} userId={session?.user.id} />
+            <PostFeed
+                initialPosts={subreddit.posts}
+                subredditName={subreddit.name}
+                userId={session?.user.id}
+            />
         </>
     )
 }
