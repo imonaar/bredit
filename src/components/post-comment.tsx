@@ -1,9 +1,15 @@
 "use client"
 
 import { Comment, CommentVote, User } from '@prisma/client'
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { UserAvatar } from './user-avatar'
 import { formatTimeToNow } from '@/lib/utils'
+import { CommentVotes } from './post-vote/comment-votes'
+import { Button } from './ui/Button'
+import { MessageSquare, Reply } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { CreateComment } from './create-comment'
 
 type ExtendedComment = (Comment & {
   votes: CommentVote[],
@@ -11,11 +17,17 @@ type ExtendedComment = (Comment & {
 })
 
 interface PostCommentProps {
-  comment: ExtendedComment
+  comment: ExtendedComment,
+  votesAmt: number,
+  currentVote: CommentVote | undefined,
+  postId: string
 }
 
-export function PostComment({ comment }: PostCommentProps) {
+export function PostComment({ comment, votesAmt, currentVote, postId }: PostCommentProps) {
   const commentRef = useRef<HTMLDivElement>(null)
+  const [isReplying, setIsReplying] = useState(false)
+  const router = useRouter()
+  const { data: session } = useSession()
   return (
     <div
       ref={commentRef}
@@ -39,6 +51,35 @@ export function PostComment({ comment }: PostCommentProps) {
         </div>
       </div>
       <p className='text-sm text-zinc-900'>{comment.text}</p>
+      <div className='flex gap-2 items-center'>
+        <CommentVotes
+          commentId={comment.id}
+          initialVotesAmount={votesAmt}
+          initialVote={currentVote}
+        />
+        <Button
+          size={"xs"}
+          variant={"ghost"}
+          aria-label='reply'
+          onClick={() => {
+
+            if (!session) {
+              router.push('/sign-in')
+            }
+            setIsReplying(() => !isReplying)
+          }}
+        >
+          <Reply className='h-5 w-5 mr-1.5' />
+        </Button>
+      </div>
+
+      {
+        isReplying ? (
+          <div>
+            <CreateComment postId={postId} replyToId={comment.replyToId ?? comment.id} />
+          </div>
+        ) : null
+      }
     </div>
   )
 }

@@ -2,11 +2,10 @@ import { useRef } from "react";
 
 import { formatTimeToNow } from "@/lib/utils";
 import { ExtendedPost } from "@/types/db";
-import Link from "next/link";
+import { Vote } from "@prisma/client";
 import { MessageSquare } from "lucide-react";
 import { EditorOutput } from "./editor-output";
-import { PostVoteClient } from "./post-vote/post-vote-client"
-import { Vote } from "@prisma/client";
+import { PostVoteClient } from "./post-vote/post-vote-client";
 
 type PartialVote = Pick<Vote, 'type'>
 

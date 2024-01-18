@@ -46,6 +46,7 @@ export default async function PostPage({ params }: PageProps) {
         <div>
             <div className='h-full flex flex-col sm:flex-row items-center sm:items-start'>
                 <Suspense fallback={<PostVoteShell />}>
+
                     <PostVoteServer
                         postId={post?.id ?? cachedPost.id}
                         getData={async () => {

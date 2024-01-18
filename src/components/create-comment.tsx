@@ -14,14 +14,13 @@ import {
     FormMessage
 } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
-import { Button } from "./ui/Button"
-import { useMutation } from "@tanstack/react-query"
-import { CommentRequest } from "@/lib/validators/comment"
-import axios, { AxiosError } from "axios"
-import { toast } from "@/hooks/use-toast"
 import { useCustomToast } from "@/hooks/use-custom-tost"
+import { toast } from "@/hooks/use-toast"
+import { CommentRequest } from "@/lib/validators/comment"
+import { useMutation } from "@tanstack/react-query"
+import axios, { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { Button } from "./ui/Button"
 
 const CommentFormSchema = z.object({
     comment: z.string()
@@ -47,6 +46,7 @@ export function CreateComment({ postId, replyToId }: { postId: string, replyToId
 
             const { data } = await axios.patch('/api/subreddit/post/comment', payload)
             return data
+
         },
         onError: (err) => {
             if (err instanceof AxiosError) {
@@ -68,12 +68,12 @@ export function CreateComment({ postId, replyToId }: { postId: string, replyToId
     })
 
     function onSubmit(data: z.infer<typeof CommentFormSchema>) {
-        console.log(data)
         mutate({
             text: data.comment,
             postId,
-
+            replyToId
         })
+
         reset({ comment: "" }, {
             keepValues: false,
         })
