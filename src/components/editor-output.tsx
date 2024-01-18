@@ -1,3 +1,5 @@
+"use client"
+
 import dynamic from "next/dynamic";
 import CustomImageRenderer from "./renderers/custom-image-renderer";
 import CustomCodeRenderer from "./renderers/custom-code-renderer";
