@@ -41,7 +41,7 @@ const PostPage = ({ subredditName, post, commentAmt, votesAmt, currentVote }: Po
                                 </>
                             ) : null
                         }
-                        <span>Posted by u/{post.author.name}</span>{' '}
+                        <span>Posted by u/{post.author.username}</span>{' '}
                         {formatTimeToNow(new Date(post.createdAt))}
                     </div>
 
