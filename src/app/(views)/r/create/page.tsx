@@ -107,11 +107,8 @@ export default function CreatePage() {
                                             <p className='text-xs pb-2'>Community names including capitalization cannot be changed</p>
                                         </FormLabel>
                                         <FormControl>
-                                            <Input placeholder="shadcn" {...field} />
+                                            <Input placeholder="name" {...field} />
                                         </FormControl>
-                                        <FormDescription>
-                                            This is your public display name.
-                                        </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
